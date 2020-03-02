@@ -1,0 +1,47 @@
+{
+  "builders": [
+    {
+      "type": "digitalocean",
+      "name": "base-minion",
+      "region": "ams2",
+      "size": "s-1vcpu-1gb",
+      "image": "ubuntu-18-04-x64",
+      "private_networking": true,
+      "ssh_username": "root"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "inline": [
+        "wget -O - https://repo.saltstack.com/apt/ubuntu/18.04/amd64/2018.3/SALTSTACK-GPG-KEY.pub | sudo apt-key add -",
+        "sudo add-apt-repository \"http://repo.saltstack.com/apt/ubuntu/18.04/amd64/2018.3 bionic main\"",
+        "sudo apt-get update -y",
+        "sudo apt-get upgrade -y",
+        "sudo apt-get install -y salt-minion",
+        "sudo systemctl enable salt-minion",
+        "sudo systemctl stop salt-minion",
+        "sudo mkdir -p /etc/dnsmasq.d",
+        "sudo systemctl disable systemd-resolved"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "./terraform/scripts/dnsmasq.conf",
+      "destination": "/etc/dnsmasq.d/dnsmasq.conf"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get install dnsmasq -y",
+        "sudo apt-get remove resolvconf -y",
+        "sudo rm /etc/resolv.conf"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "./terraform/scripts/resolv.conf",
+      "destination": "/etc/resolv.conf"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+#! /usr/bin/env ruby
+
+# startup_ops - main entry script for running Terraform, and other devops functions and utilities
+require 'pathname'
+require_relative './utils'
+
+# Change to the directory of this file, so that all relative paths will resolve.
+Dir.chdir(File.dirname(Pathname.new(__FILE__).realpath))
+
+# Get the environment and command from the command line.
+@environment = ARGV[0]
+@command = ARGV[1]
+@other_args = ARGV[2..-1]
+
+determine_envchain_namespace
+check_valid_environment!
+check_valid_command!
+confirm_production!
+
+if @command == 'encrypt'
+  encrypt_secret!
+end
+
+with_terraform_remote_state do
+  case @command
+  when 'plan' then terraform_plan!
+  when 'apply' then terraform_apply!
+  end
+end

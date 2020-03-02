@@ -1,0 +1,7 @@
+.terraform/**/*
+terraform/.terraform/**/*
+*.swp
+
+# Tooling
+.idea/
+.vscode/

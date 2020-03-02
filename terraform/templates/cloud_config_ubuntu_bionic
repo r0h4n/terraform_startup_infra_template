@@ -1,0 +1,10 @@
+#cloud-config
+
+# Feel free to use alternatives to saltstack for configuration management
+runcmd:
+  - "echo \"server=/sgp1.startup.com/${internal_dns_ip}\" > /etc/dnsmasq.d/internal_dns.conf"
+  - sudo systemctl restart dnsmasq
+  - echo %s > /etc/salt/minion_id
+  - echo "${saltmaster_ip} salt" >> /etc/hosts
+  - "echo \"env: ${env_slug}\" > /etc/salt/grains"
+  - sudo systemctl restart salt-minion
